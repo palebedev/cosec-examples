@@ -1,0 +1,10 @@
+<RCC>
+    <qresource prefix="/images">
+        <file>images/arrow-forward-circle-outline.svg</file>
+        <file>images/exit-outline.svg</file>
+        <file>images/folder-open-outline.svg</file>
+        <file>images/globe-outline.svg</file>
+        <file>images/information-circle-outline.svg</file>
+        <file>images/shield-outline.svg</file>
+    </qresource>
+</RCC>
