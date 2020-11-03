@@ -5,7 +5,11 @@
 
 #include <sys/types.h>
 #include <sys/wait.h>
+#include <signal.h>
 #include <unistd.h>
+
+#include <cassert>
+#include <exception>
 
 class fork
 {
@@ -13,6 +17,9 @@ public:
     fork()
         : child_pid_{::fork()}
     {
+        // We expect to not be constructed during exception handling,
+        // see destructor.
+        assert(!std::uncaught_exceptions());
         throw_errno_if_negative(child_pid_,"fork");
     }
 
@@ -24,8 +31,15 @@ public:
 
     ~fork()
     {
-        if(child_pid_)
+        if(child_pid_){
+            if(std::uncaught_exceptions())
+                // We are exiting due to a thrown exception.
+                // We're not going to follow our parent-child protocol,
+                // so just kill the child so that we don't hang
+                // waiting for it.
+                kill(child_pid_,SIGTERM);
             waitpid(child_pid_,nullptr,0);
+        }
     }
 
     explicit operator bool() const noexcept
