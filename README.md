@@ -1,7 +1,7 @@
 Examples for COSEC students
 ===========================
 
-It is assumed you have made yourself familiar with `ntc-cmake`, what it automates and how, please start there.
+It is assumed you have made yourself familiar with `ntc-cmake`, what it automates and how, please start there (see dependencies below for the link).
 
 - Serialization:
   - `interprocess-copy`: benchmark of various interprocess data copy implementations.
