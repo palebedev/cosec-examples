@@ -6,7 +6,7 @@ project(cosec-examples
     LANGUAGES CXX
 )
 
-find_package(ntc-cmake 1.0.1 REQUIRED)
+find_package(ntc-cmake 1.1.0 REQUIRED)
 include(ntc-dev-build)
 
 find_package(Boost 1.74 REQUIRED COMPONENTS chrono log system thread)

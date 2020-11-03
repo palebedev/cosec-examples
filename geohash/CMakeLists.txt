@@ -6,12 +6,6 @@ add_executable(geohash
 )
 target_compile_features(geohash PRIVATE cxx_std_20)
 
-set_target_properties(geohash PROPERTIES
-    AUTOMOC ON
-    AUTOUIC ON
-    WIN32_EXECUTABLE ON
-)
-
 target_link_libraries(geohash PRIVATE
     Qt5::Widgets
     Qt5::Network

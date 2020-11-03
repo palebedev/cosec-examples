@@ -16,6 +16,6 @@ It is assumed you have made yourself familiar with `ntc-cmake`, what it automate
 
 Dependencies:
 - C++ compiler and standard library with sufficient support for C++20.
-- \>=ntc-cmake-1.0.1 - see https://github.com/palebedev/ntc-cmake
+- \>=ntc-cmake-1.1.0 - see https://github.com/palebedev/ntc-cmake
 - \>=Boost-1.74.0
 - \>=google-benchmark-1.5.0

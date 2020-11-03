@@ -9,8 +9,5 @@ add_executable(item-models
 target_compile_features(item-models PRIVATE cxx_std_20)
 
 target_link_libraries(item-models PRIVATE Qt5::Widgets)
-set_target_properties(item-models PROPERTIES
-    AUTOMOC ON
-    AUTOUIC ON
-    WIN32_EXECUTABLE ON
-)
+
+ntc_target(item-models)
