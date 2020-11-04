@@ -27,7 +27,7 @@ namespace
                     !fp.isEmpty())
                 dirs.append(fp);
             // QStandardPaths uses only /usr prefix, but provides os-specific profile locations.
-            for(QString fp:QStandardPaths::standardLocations(QStandardPaths::AppDataLocation))
+            for(const QString& fp:QStandardPaths::standardLocations(QStandardPaths::AppDataLocation))
                 if(QFileInfo::exists(fp)&&!dirs.contains(fp))
                     dirs.append(fp);
         }
@@ -38,7 +38,7 @@ namespace
     {
         QStringList dirs;
         if(dirs.isEmpty())
-            for(QString fp:getDataDirs())
+            for(const QString& fp:getDataDirs())
                 if(QString tp = fp+QStringLiteral("/translations");QFileInfo::exists(tp))
                     dirs.append(tp);
         return dirs;
@@ -57,8 +57,8 @@ QStringList getAvailableTranslations()
     QStringList translations;
     if(translations.isEmpty()){
         int appNameLength = qApp->applicationName().size();
-        for(QString tp:getTranslationDirs())
-            for(QString name:QDir(tp).entryList({
+        for(const QString& tp:getTranslationDirs())
+            for(const QString& name:QDir(tp).entryList({
                     qApp->applicationName()+QStringLiteral("_*.qm")})){
 
                 auto lang = name.mid(appNameLength+1,name.size()-appNameLength-4);
@@ -73,7 +73,7 @@ QStringList getFullTranslationNames(const QStringList& translations)
 {
     QStringList ftn;
     ftn.reserve(translations.size());
-    for(QString language:translations)
+    for(const QString& language:translations)
         ftn.append(QLocale(language).nativeLanguageName());
     return ftn;
 }
@@ -84,7 +84,7 @@ bool loadTranslation(const QString& language)
     qApp->removeTranslator(&qtTranslator);
     QString nameBase = qApp->applicationName()+QLatin1Char('_')+language,
             fileName = nameBase+QStringLiteral(".qm");
-    for(QString tp:getTranslationDirs())
+    for(const QString& tp:getTranslationDirs())
         if(QFileInfo::exists(tp+QLatin1Char('/')+fileName)){
             if(!appTranslator.load(nameBase,tp))
                 return false;
