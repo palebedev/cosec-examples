@@ -27,8 +27,6 @@ private slots:
 private:
     QScopedPointer<Ui::MainWindow> ui_;
     QActionGroup* languagesGroup_;
-
-    void loadSystemLocale();
 };
 
 #endif

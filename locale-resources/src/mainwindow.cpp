@@ -24,9 +24,22 @@ MainWindow::MainWindow(QWidget* parent) :
         languagesGroup_->addAction(langAction);
         ui_->languageMenu->addAction(langAction);
     }
-    loadSystemLocale();
-    if(auto ca = languagesGroup_->checkedAction())
-        langActionSelected(ca);
+    // An application should follow user's preference for the display
+    // language when that information is available from the previous
+    // run of the program or default to the user's ui preferred
+    // languages, if possible.
+    // Loading/saving preferred languages is not implemented in this example.
+    QString lang;
+    // if(applicaiton-configuration-exists)
+    //      lang = load_lang_from_config();
+    // else
+        lang = getTranslationClosestToUiLanguage();
+    int index = translations.indexOf(lang);
+    if(index>=0){
+        auto action = languagesGroup_->actions()[index];
+        action->setChecked(true);
+        langActionSelected(action);
+    }
 }
 
 MainWindow::~MainWindow() = default;
@@ -39,29 +52,13 @@ void MainWindow::changeEvent(QEvent* event)
             setWindowTitle(qApp->applicationDisplayName());
             break;
         case QEvent::LocaleChange:
-            loadSystemLocale();
+            // If the locale changes when our app is running
+            // we should probably do nothing to honor user's choice.
             break;
         default:
             ;
     }
     QMainWindow::changeEvent(event);
-}
-
-void MainWindow::loadSystemLocale()
-{
-    auto name = QLocale::system().name();
-    name.truncate(name.indexOf(QLatin1Char('_')));
-    QAction* systemLanguageAction = nullptr;
-    for(QAction* langAction:languagesGroup_->actions()){
-        QString lang = langAction->data().toString();
-        if(lang==name){
-            systemLanguageAction = langAction;
-            break;
-        }else if(lang==QStringLiteral("en"))
-            systemLanguageAction = langAction;
-    }
-    if(systemLanguageAction)
-        systemLanguageAction->setChecked(true);
 }
 
 void MainWindow::langActionSelected(QAction* action)

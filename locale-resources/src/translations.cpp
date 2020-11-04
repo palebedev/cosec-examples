@@ -97,3 +97,21 @@ bool loadTranslation(const QString& language)
     qApp->setApplicationDisplayName(qApp->translate("Global","Locale & Resources Test Application"));
     return true;
 }
+
+QString getTranslationClosestToUiLanguage()
+{
+    // QTranslator::load(QLocale) has a good degradation algorithm but doesn't
+    // consider multiple data directories. Try all directories for the longest
+    // (most detailed) language name.
+    auto tds = getTranslationDirs();
+    QString bestLang;
+    QTranslator translator;
+    auto locale = QLocale::system();
+    for(const QString& td:tds){
+        if(!translator.load(locale,qApp->applicationName(),QStringLiteral("_"),td))
+            continue;
+        if(translator.language().size()>bestLang.size())
+            bestLang = translator.language();
+    }
+    return bestLang.isEmpty()?QStringLiteral("en"):bestLang;
+}

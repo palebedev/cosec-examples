@@ -6,5 +6,6 @@
 QStringList getAvailableTranslations();
 QStringList getFullTranslationNames(const QStringList& translations);
 bool loadTranslation(const QString& language);
+QString getTranslationClosestToUiLanguage();
 
 #endif
