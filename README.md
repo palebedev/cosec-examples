@@ -4,6 +4,7 @@ Examples for COSEC students
 It is assumed you have made yourself familiar with `ntc-cmake`, what it automates and how, please start there (see dependencies below for the link).
 
 - Serialization:
+  - `schema-serial`: usage of Flatbuffers as a serialization library with external schema specification and code generator.
   - `interprocess-copy`: benchmark of various interprocess data copy implementations.
 - Asynchrony:
   - `thread-pool`: simple thread pool and executor usage.
@@ -20,3 +21,4 @@ Dependencies:
 - \>=ntc-cmake-1.1.0 - see https://github.com/palebedev/ntc-cmake
 - \>=Boost-1.74.0
 - \>=google-benchmark-1.5.0
+- \>=FlatBuffers-1.12.0

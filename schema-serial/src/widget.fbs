@@ -1,0 +1,17 @@
+namespace widgets;
+
+struct point2d
+{
+    x : int;
+    y : int;
+}
+
+table widget
+{
+    name : string;
+    pos : point2d;
+    opacity : float64 = 1.0;
+    frobs : [uint64];
+}
+
+root_type widget;

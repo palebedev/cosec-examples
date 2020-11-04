@@ -11,8 +11,13 @@ include(ntc-dev-build)
 
 find_package(Boost 1.74 REQUIRED COMPONENTS chrono log system thread)
 find_package(benchmark 1.5.0)
+# Flatbuffers package provides no version info.
+find_package(Flatbuffers)
 find_package(Qt5 COMPONENTS Widgets LinguistTools Svg Network Positioning WebEngineWidgets)
 
+if(Flatbuffers_FOUND)
+    add_subdirectory(schema-serial)
+endif()
 if(benchmark_FOUND)
     if(CMAKE_SYSTEM_NAME STREQUAL Linux)
         # eventfd is required and is Linux-only.
