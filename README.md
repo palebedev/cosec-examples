@@ -12,6 +12,7 @@ It is assumed you have made yourself familiar with `ntc-cmake`, what it automate
 - Qt:
   - `layouts-painting`: basic use signals/slots, Qt Designer, layouts and mouse/paint events for custom-looking widgets.
   - `item-models`: usage of Qt Item Models and Views/Widgets.
+  - `block-scene`: usage of `QGraphicsScene`, items and views.
   - `gui-progress`: offloading lengthy tasks to a non-gui QThread and communicating with it using queued signals/slots.
   - `locale-resources`: usage of resources and translations in Qt.
   - `geohash`: qtpositioning + simple use of `QNetworkAccessManager` from qtnetwork.
