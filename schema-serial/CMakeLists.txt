@@ -23,6 +23,7 @@ function(flat_buffers_autogen target)
                 OUTPUT "${output}"
                 COMMAND "${flatc}" --cpp -o "${output_dir}" "${source}"
                 MAIN_DEPENDENCY "${source}"
+                VERBATIM
             )
             target_sources(${target} PRIVATE "${output}")
         endif()
