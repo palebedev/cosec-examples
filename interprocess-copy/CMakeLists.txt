@@ -2,6 +2,7 @@ add_executable(interprocess-copy
     src/event.hpp
     src/file_descriptor.hpp
     src/fork.hpp
+    src/knem.hpp
     src/main.cpp
     src/memfd.hpp
     src/pipe.hpp
