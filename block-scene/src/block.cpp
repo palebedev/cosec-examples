@@ -25,7 +25,7 @@ void Block::setName(QString newName)
         name_ = std::move(newName);
         recalcSize();
         double newRight = w_-BlockMetrics::get().portSize();
-        for(auto port:outputs_)
+        for(auto port:std::as_const(outputs_))
             port->setX(newRight);
     }
 }
@@ -53,10 +53,9 @@ QRectF Block::boundingRect() const
     return {-halfSelectedPen,-halfSelectedPen,w_+halfSelectedPen,h_+halfSelectedPen};
 }
 
-void Block::paint(QPainter* painter,const QStyleOptionGraphicsItem* option,QWidget* widget)
+void Block::paint(QPainter* painter,const QStyleOptionGraphicsItem* option,QWidget* /*widget*/)
 {
     auto& bm = BlockMetrics::get();
-    auto rect = boundingRect();
     bool is_selected = option->state&QStyle::State_Selected;
     const QPen& borderPen = is_selected?bm.selectedPen():bm.normalPen();
     const QPen& innerPen = bm.normalPen();
@@ -64,7 +63,8 @@ void Block::paint(QPainter* painter,const QStyleOptionGraphicsItem* option,QWidg
            right = w_-bm.portSize();
     painter->setPen(borderPen);
     painter->setBrush(is_selected?bm.selectedBrush():bm.normalBrush());
-    painter->drawRect(QRectF{0,0,w_,h_});
+    QRectF rect{0,0,w_,h_};
+    painter->drawRect(rect);
     painter->setPen(innerPen);
     painter->drawLine(QPointF{left,0},QPointF{left,h_});
     painter->drawLine(QPointF{right,0},QPointF{right,h_});
@@ -74,7 +74,6 @@ void Block::paint(QPainter* painter,const QStyleOptionGraphicsItem* option,QWidg
 void Block::recalcSize()
 {
     auto& bm = BlockMetrics::get();
-    double halfPen = bm.selectedPen().widthF()/2.;
     auto textRect = bm.fontMetrics().boundingRect(name_);
     w_ = 2*(bm.portSize()+bm.hMargin())+textRect.width();
     h_ = std::max(2*bm.hMargin()+textRect.height(),
@@ -117,5 +116,5 @@ QVariant Block::itemChange(GraphicsItemChange change,const QVariant& value)
         updateConnectionPos(inputs_);
         updateConnectionPos(outputs_);
     }
-    return QGraphicsItem::itemChange(change,value);
+    return OpaqueGraphicsItem::itemChange(change,value);
 }

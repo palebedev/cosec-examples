@@ -32,6 +32,7 @@ QStringList BlockTypesModel::mimeTypes() const
 QMimeData* BlockTypesModel::mimeData(const QModelIndexList& indexes) const
 {
     auto md = new QMimeData;
+    // Our data format is concatenation of null-terminated UTF-8 strings.
     QString s;
     auto& bt = getRegisteredBlockTypes();
     for(const QModelIndex& i:indexes){

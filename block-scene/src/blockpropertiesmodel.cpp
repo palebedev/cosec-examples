@@ -62,7 +62,7 @@ Qt::ItemFlags BlockPropertiesModel::flags(const QModelIndex& index) const
 
 QVariant BlockPropertiesModel::data(const QModelIndex& index,int role) const
 {
-    if(index.isValid()&&role==Qt::DisplayRole||(index.column()==1&&role==Qt::EditRole))
+    if(index.isValid()&&(role==Qt::DisplayRole||(index.column()==1&&role==Qt::EditRole)))
         switch(index.row()){
             case 0:
                 return !index.column()?tr("Name"):block_->name();

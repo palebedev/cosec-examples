@@ -40,7 +40,7 @@ public:
     int type() const override;
     QRectF boundingRect() const override;
     void paint(QPainter* painter,const QStyleOptionGraphicsItem* option,
-               QWidget* widget = nullptr) override;
+               QWidget* /*widget*/ = nullptr) override;
 protected:
     QVariant itemChange(GraphicsItemChange change,const QVariant& value) override;
 private:

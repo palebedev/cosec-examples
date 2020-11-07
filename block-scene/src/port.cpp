@@ -28,7 +28,7 @@ QRectF Port::boundingRect() const
     return BlockMetrics::get().portRect();
 }
 
-void Port::paint(QPainter* painter,const QStyleOptionGraphicsItem* option,QWidget* widget)
+void Port::paint(QPainter* painter,const QStyleOptionGraphicsItem* option,QWidget* /*widget*/)
 {
     auto& bm = BlockMetrics::get();
     painter->setPen(bm.normalPen());
@@ -55,7 +55,7 @@ void Port::mouseMoveEvent(QGraphicsSceneMouseEvent* event)
         connection_->setEnd(event->scenePos());
 }
 
-void Port::mouseReleaseEvent(QGraphicsSceneMouseEvent* event)
+void Port::mouseReleaseEvent(QGraphicsSceneMouseEvent* /*event*/)
 {
     if(!creatingConnection_)
         return;
@@ -63,9 +63,7 @@ void Port::mouseReleaseEvent(QGraphicsSceneMouseEvent* event)
         connection_->output()->connection_ =
             connection_->input()->connection_ =
                 connection_;
-    else{
+    else
         delete connection_;
-        connection_ = nullptr;
-    }
     creatingConnection_ = false;
 }

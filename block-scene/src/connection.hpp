@@ -31,7 +31,7 @@ public:
     QRectF boundingRect() const override;
     QPainterPath shape() const override;
     void paint(QPainter* painter,const QStyleOptionGraphicsItem* option,
-               QWidget* widget = nullptr) override;
+               QWidget* /*widget*/ = nullptr) override;
 private:
     Port* output_;
     Port* input_ = nullptr;

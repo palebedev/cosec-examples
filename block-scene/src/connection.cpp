@@ -66,9 +66,9 @@ QPainterPath Connection::shape() const
     return path_;
 }
 
-void Connection::paint(QPainter* painter,const QStyleOptionGraphicsItem* option,QWidget* widget)
+void Connection::paint(QPainter* painter,const QStyleOptionGraphicsItem* option,QWidget* /*widget*/)
 {
     auto& bm = BlockMetrics::get();
-    painter->setPen(option->state&QStyle::State_Selected?bm.selectedPen():bm.normalPen());
+    painter->setPen((option->state&QStyle::State_Selected)?bm.selectedPen():bm.normalPen());
     painter->drawPath(path_);
 }
