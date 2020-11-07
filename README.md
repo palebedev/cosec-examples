@@ -16,9 +16,11 @@ It is assumed you have made yourself familiar with `ntc-cmake`, what it automate
   - `gui-progress`: offloading lengthy tasks to a non-gui QThread and communicating with it using queued signals/slots.
   - `locale-resources`: usage of resources and translations in Qt.
   - `geohash`: qtpositioning + simple use of `QNetworkAccessManager` from qtnetwork.
+- Miscellaneous:
+  - `et`: use of expression templates to optimize evaluation of expressions.
 
 Dependencies:
-- C++ compiler and standard library with sufficient support for C++20.
+- C++ compiler and standard library with sufficient support for C++20 and `std::experimental::ostream_joiner` from Library Fundamentals TSv2.
 - \>=ntc-cmake-1.1.0 - see https://github.com/palebedev/ntc-cmake
 - \>=Boost-1.74.0
 - \>=google-benchmark-1.5.0
