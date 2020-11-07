@@ -19,7 +19,7 @@ namespace ce
         CE_UTILS_EXPORT std::ostream& operator<<(std::ostream& stream,const hex_t& ht);
     }
 
-    auto hex(std::span<const std::byte> data,std::size_t columns = std::size_t(-1)) noexcept
+    inline auto hex(std::span<const std::byte> data,std::size_t columns = std::size_t(-1)) noexcept
     {
         return detail::hex_t{data,columns};
     }
