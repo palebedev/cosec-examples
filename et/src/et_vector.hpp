@@ -1,15 +1,17 @@
 #ifndef UUID_762A2B41_DA34_443A_8C5C_09C3734E80DE
 #define UUID_762A2B41_DA34_443A_8C5C_09C3734E80DE
 
-#include "vector_base.hpp"
-
-#include <iterator>
-#include <type_traits>
+#include "common.hpp"
 
 namespace et
 {
-    template<typename T = double>
-    class vector : public vector_base<T>
+    // We assume the following concept for vector expression template nodes:
+    // - nested type vector_et_elem_t is element type (used to enable et operations)
+    // - size() returns number of elements (1 for scalars)
+    // - operator[] provides per-element access.
+
+    template<typename T>
+    class vector : public boost::container::vector<T>
     {
     public:
         // Presence of vector_et_elem_t nested type
@@ -17,164 +19,165 @@ namespace et
         // including the vector itself.
         using vector_et_elem_t = T;
 
-        using vector_base<T>::vector_base;
+        using boost::container::vector<T>::vector;
     };
 
     namespace detail
     {
-        template<typename Derived,typename T>
-        class vector_et_node_base
+        template<typename Op,typename T,typename U>
+        class vector_et_node;
+
+        template<typename T>
+        struct is_vector_et_node : std::false_type {};
+
+        template<typename Op,typename T,typename U>
+        struct is_vector_et_node<vector_et_node<Op,T,U>> : std::true_type {};
+
+        template<typename T>
+        constexpr inline bool is_vector_et_node_v = is_vector_et_node<T>{};
+
+        template<typename Op,typename T,typename U>
+        class vector_et_node
         {
         public:
-            // Nodes are also et-enabled
-            using vector_et_elem_t = T;
+            using vector_et_elem_t = op_result_t<Op,
+                typename std::remove_cvref_t<T>::vector_et_elem_t,
+                typename std::remove_cvref_t<U>::vector_et_elem_t>;
 
-            // When a node is to be converted to a real vector,
-            // calculate its elements in a single loop.
-            operator vector<T>() const
+            vector_et_node(T&& x,U&& y)
+                : x_{std::forward<T>(x)},
+                  y_{std::forward<U>(y)}
             {
-                const Derived& this_ = static_cast<const Derived&>(*this);
-                vector<T> ret{this_.size(),boost::container::default_init};
-                for(std::size_t i=0;i<ret.size();++i)
-                    ret[i] = this_[i];
+                // Either both have same size, or exactly one is a scalar.
+                assert(x_.size()==y_.size()||
+                       (x_.size()==1)!=(y_.size()==1));
+            }
+
+            std::size_t size() const noexcept
+            {
+                // One of the two args could be a scalar with size 1,
+                // if neither is, we've already asserted both have same size
+                // at construction, so just take the max of sizes.
+                return std::max(x_.size(),y_.size());
+            }
+
+            vector_et_elem_t operator[](std::size_t i) &&
+            {
+                return Op{}(std::forward<T>(x_)[i],std::forward<U>(y_)[i]);
+            }
+
+            operator vector<vector_et_elem_t>() &&
+            {
+                vector<vector_et_elem_t> ret;
+                auto&& stolen = std::move(*this).steal();
+                if constexpr(std::is_same_v<decltype(stolen),vector<vector_et_elem_t>&&>)
+                    ret = std::move(stolen);
+                else
+                    ret.resize(size(),boost::container::default_init);
+                std::generate(ret.begin(),ret.end(),[this,i=std::size_t{}]() mutable {
+                    return std::move(*this)[i++];
+                });
                 return ret;
             }
+
+            template<typename Res = vector_et_elem_t>
+            decltype(auto) steal() &&
+            {
+                if constexpr(std::is_same_v<T,vector<Res>>)
+                    return std::move(x_);
+                else if constexpr(std::is_same_v<U,vector<Res>>)
+                    return std::move(y_);
+                else if constexpr(is_vector_et_node_v<T>){
+                    auto&& ret = std::move(x_).template steal<Res>();
+                    if constexpr(std::is_same_v<decltype(ret),vector<Res>&&>)
+                        return std::move(ret);
+                }
+                if constexpr(is_vector_et_node_v<U>)
+                    return std::move(y_).template steal<Res>();
+                else
+                    return nullptr;
+            }
+        private:
+            T&& x_;
+            U&& y_;
         };
 
-        // A type of element for two et-enabled classes is a common
-        // type of its elements.
-        template<typename Node1,typename Node2>
-        using vector_et_binary_node_elem_t = std::common_type_t<
-            typename Node1::vector_et_elem_t,
-            typename Node2::vector_et_elem_t
-        >;
-
-        // Base classes for binary operator et nodes.
-        // It stores both subnodes and provides size.
-        template<typename Derived,typename Node1,typename Node2>
-        class vector_et_binary_node_base :
-            public vector_et_node_base<
-                Derived,
-                vector_et_binary_node_elem_t<Node1,Node2>
-            >
+        template<typename T>
+        class scalar_wrapper
         {
         public:
-            vector_et_binary_node_base(const Node1& n1,const Node2& n2) noexcept
-                : n1_{n1},
-                  n2_{n2}
-            {
-                assert(n1.size()==n2.size());
-            }
+            using vector_et_elem_t = const T&;
 
-            std::size_t size() const noexcept
-            {
-                return n1_.size();
-            }
-        protected:
-            const Node1& n1_;
-            const Node2& n2_;
-        };
-
-        // Node for addition provides implementation of operator[].
-        template<typename Node1,typename Node2>
-        class vector_et_add_node :
-            public vector_et_binary_node_base<
-                vector_et_add_node<Node1,Node2>,Node1,Node2>
-        {
-        public:
-            using vector_et_binary_node_base<
-                vector_et_add_node<Node1,Node2>,Node1,Node2>::vector_et_binary_node_base;
-
-            auto operator[](std::size_t i) const
-            {
-                return this->n1_[i]+this->n2_[i];
-            }
-        };
-
-        // Same for subtraction.
-        template<typename Node1,typename Node2>
-        class vector_et_sub_node :
-            public vector_et_binary_node_base<
-                vector_et_sub_node<Node1,Node2>,Node1,Node2>
-        {
-        public:
-            using vector_et_binary_node_base<
-                vector_et_sub_node<Node1,Node2>,Node1,Node2>::vector_et_binary_node_base;
-
-            auto operator[](std::size_t i) const
-            {
-                return this->n1_[i]-this->n2_[i];
-            }
-        };
-
-        template<typename Node,typename Coeff>
-        using vector_et_mul_node_elem_t = std::common_type_t<
-            typename Node::vector_et_elem_t,Coeff>;
-
-        template<typename Node,typename Coeff>
-        class vector_et_mul_node :
-            public vector_et_node_base<
-                vector_et_mul_node<Node,Coeff>,
-                vector_et_mul_node_elem_t<Node,Coeff>
-            >
-        {
-        public:
-            vector_et_mul_node(const Node& n,Coeff coeff)
-                : n_{n},
-                  coeff_{coeff}
+            scalar_wrapper(const T& x) noexcept
+                : x_{x}
             {}
 
-            auto operator[](std::size_t i) const
+            constexpr static std::size_t size() noexcept
             {
-                return this->n_[i]*coeff_;
+                return 1;
             }
 
-            std::size_t size() const noexcept
+            const T& operator[](std::size_t /*i*/) const noexcept
             {
-                return n_.size();
+                return x_;
             }
-        protected:
-            const Node& n_;
-            Coeff coeff_;
+        private:
+            const T& x_;
         };
+
+        template<typename Op,typename T,typename U>
+        using op_result_vv_t = op_result_t<Op,typename std::remove_cvref_t<T>::vector_et_elem_t,
+                                              typename std::remove_cvref_t<U>::vector_et_elem_t>;
+
+        template<typename Op,typename T,typename U>
+        using op_result_vs_t = op_result_t<Op,typename std::remove_cvref_t<T>::vector_et_elem_t,U>;
+
+        template<typename Op,typename T,typename U>
+        using op_result_sv_t = op_result_t<Op,T,typename std::remove_cvref_t<U>::vector_et_elem_t>;
     }
 
-    // Operators are SFINAED on whether arguments are et-enabled vectors and have
-    // a common element type.
-    template<typename Node1,typename Node2,
-             typename = detail::vector_et_binary_node_elem_t<Node1,Node2>>
-    auto operator+(const Node1& n1,const Node2& n2)
+    template<typename T,typename U,
+             typename = detail::op_result_vv_t<std::plus<>,T,U>>
+    detail::vector_et_node<std::plus<>,T,U> operator+(T&& x,U&& y)
     {
-        // CTAD doesn't work with inherited constructors.
-        return detail::vector_et_add_node<Node1,Node2>{n1,n2};
+        return {std::forward<T>(x),std::forward<U>(y)};
     }
 
-    template<typename Node1,typename Node2,
-             typename = detail::vector_et_binary_node_elem_t<Node1,Node2>>
-    auto operator-(const Node1& n1,const Node2& n2)
+    template<typename T,typename U,
+             typename = detail::op_result_vv_t<std::minus<>,T,U>>
+    detail::vector_et_node<std::minus<>,T,U> operator-(T&& x,U&& y)
     {
-        return detail::vector_et_sub_node<Node1,Node2>{n1,n2};
+        return {std::forward<T>(x),std::forward<U>(y)};
     }
 
-    template<typename Node,typename Coeff,
-             typename = detail::vector_et_mul_node_elem_t<Node,Coeff>>
-    auto operator*(const Node& n,Coeff coeff)
+    template<typename T,typename U,
+             typename = detail::op_result_vs_t<std::multiplies<>,T,const U&>>
+    detail::vector_et_node<std::multiplies<>,T,detail::scalar_wrapper<U>> operator*(T&& x,const U& y)
     {
-        return detail::vector_et_mul_node{n,coeff};
+        return {std::forward<T>(x),detail::scalar_wrapper(y)};
     }
 
-    template<typename Node,typename Coeff,
-             typename = detail::vector_et_mul_node_elem_t<Node,Coeff>>
-    auto operator*(Coeff coeff,const Node& n)
+    template<typename T,typename U,
+             typename = detail::op_result_sv_t<std::multiplies<>,const T&,U>>
+    detail::vector_et_node<std::multiplies<>,detail::scalar_wrapper<T>,U> operator*(const T& x,U&& y)
     {
-        return detail::vector_et_mul_node{n,coeff};
+        return {detail::scalar_wrapper(x),std::forward<U>(y)};
     }
 
-    template<typename Node,typename Coeff,
-             typename = detail::vector_et_mul_node_elem_t<Node,Coeff>>
-    auto operator/(const Node& n,Coeff coeff)
+    template<typename T,typename U,
+             typename = std::enable_if_t<has_multiplicative_inverse_v<U>>>
+    auto operator/(T&& x,const U& y) -> decltype(x*multiplicative_inverse(y))
     {
-        return detail::vector_et_mul_node{n,Coeff(1)/coeff};
+        return x*multiplicative_inverse(y);
+    }
+
+    template<typename T,typename U,
+             typename = detail::op_result_vs_t<std::multiplies<>,T,
+                decltype(multiplicative_inverse(std::declval<U>()))>,
+             typename = std::enable_if_t<!has_multiplicative_inverse_v<U>>>
+    detail::vector_et_node<std::divides<>,T,detail::scalar_wrapper<U>> operator/(T&& x,const U& y)
+    {
+        return {std::forward<T>(x),detail::scalar_wrapper(y)};
     }
 }
 

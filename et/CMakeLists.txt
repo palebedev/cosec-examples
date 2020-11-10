@@ -1,8 +1,8 @@
 add_executable(et
+    src/common.hpp
     src/et_vector.hpp
     src/main.cpp
     src/naive_vector.hpp
-    src/vector_base.hpp
 )
 target_compile_features(et PRIVATE cxx_std_20)
 
