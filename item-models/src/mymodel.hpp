@@ -17,8 +17,9 @@
 // true for isValid() and refers to the root item.
 class MyModel : public QAbstractTableModel
 {
+    Q_OBJECT
 public:
-    MyModel(QObject* parent = nullptr);
+    explicit MyModel(QObject* parent = nullptr);
 
     // Number of rows in a subtable for the item at index.
     int rowCount(const QModelIndex& index = {}) const override;

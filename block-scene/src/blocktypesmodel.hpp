@@ -5,6 +5,7 @@
 
 class BlockTypesModel : public QAbstractListModel
 {
+    Q_OBJECT
 public:
     using QAbstractListModel::QAbstractListModel;
 

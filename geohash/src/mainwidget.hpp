@@ -17,8 +17,8 @@ class MainWidget : public QWidget
 {
     Q_OBJECT
 public:
-    MainWidget(QWidget* parent = nullptr);
-    ~MainWidget();
+    explicit MainWidget(QWidget* parent = nullptr);
+    ~MainWidget() override;
 private:
     QScopedPointer<Ui::MainWidget> ui_;
     QGeoCoordinate coord_;

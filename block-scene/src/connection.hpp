@@ -10,7 +10,7 @@ class Connection : public OpaqueGraphicsItem
 public:
     enum { Type = UserType+2 };
 
-    Connection(Port& output);
+    explicit Connection(Port& output);
     ~Connection();
 
     Port* output() const noexcept

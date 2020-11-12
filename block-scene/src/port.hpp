@@ -18,7 +18,7 @@ public:
     enum { Type = UserType+2 };
 
     Port(Block& parent,PortType portType);
-    ~Port();
+    ~Port() override;
 
     PortType portType() const noexcept
     {

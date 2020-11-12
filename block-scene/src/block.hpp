@@ -14,7 +14,7 @@ class Block : public OpaqueGraphicsItem
 public:
     enum { Type = UserType+1 };
 
-    Block(QGraphicsItem* parent = nullptr);
+    explicit Block(QGraphicsItem* parent = nullptr);
 
     const QString& name() const noexcept
     {

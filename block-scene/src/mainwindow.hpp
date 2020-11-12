@@ -17,9 +17,10 @@ class BlockTypesModel;
 
 class MainWindow : public QWidget
 {
+    Q_OBJECT
 public:
-    MainWindow(QWidget* parent = nullptr);
-    ~MainWindow();
+    explicit MainWindow(QWidget* parent = nullptr);
+    ~MainWindow() override;
 private:
     QScopedPointer<Ui::MainWindow> ui_;
     BlockTypesModel* btm_;
