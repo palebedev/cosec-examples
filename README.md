@@ -24,5 +24,6 @@ Dependencies:
 - C++ compiler and standard library with sufficient support for C++20.
 - \>=ntc-cmake-1.1.0 - see https://github.com/palebedev/ntc-cmake
 - \>=Boost-1.74.0
+- \>=Qt-5.15 (LinguistTools,Network,Positioning,Sql,Svg,WebEngineWidgets modules and their dependencies)
 - \>=google-benchmark-1.5.0
 - \>=FlatBuffers-1.12.0

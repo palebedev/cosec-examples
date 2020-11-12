@@ -13,7 +13,7 @@ find_package(Boost 1.74 REQUIRED COMPONENTS chrono container log system thread)
 find_package(benchmark 1.5.0)
 # Flatbuffers package provides no version info.
 find_package(Flatbuffers)
-find_package(Qt5 COMPONENTS LinguistTools Network Positioning Sql Svg Widgets WebEngineWidgets)
+find_package(Qt5 5.15 COMPONENTS LinguistTools Network Positioning Sql Svg WebEngineWidgets)
 
 if(Flatbuffers_FOUND)
     add_subdirectory(schema-serial)
