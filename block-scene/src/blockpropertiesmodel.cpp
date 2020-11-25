@@ -18,11 +18,11 @@ void BlockPropertiesModel::setBlock(Block* newBlock)
         endInsertRows();
     }else if(!newBlock){
         beginRemoveRows({},0,propertiesCount-1);
-        block_ = newBlock;
+        block_ = nullptr;
         endRemoveRows();
     }else{
         block_ = newBlock;
-        emit dataChanged(index(0,0),index(propertiesCount-1,1));
+        emit dataChanged(index(0,1),index(propertiesCount-1,1));
     }
 }
 
