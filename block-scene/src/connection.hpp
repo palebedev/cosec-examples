@@ -11,7 +11,7 @@ public:
     enum { Type = UserType+3 };
 
     explicit Connection(Port& output);
-    ~Connection();
+    ~Connection() override;
 
     Port* output() const noexcept
     {
