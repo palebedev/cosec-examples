@@ -2,6 +2,7 @@ add_library(ce-utils
     include/ce/asio_ns.hpp
     include/ce/charconv.hpp
     include/ce/format.hpp
+    include/ce/get_socket.hpp
     include/ce/hex.hpp
     include/ce/io_context_signal_interrupter.hpp
     include/ce/socket_session.hpp
