@@ -8,7 +8,7 @@ class Port;
 class Connection : public OpaqueGraphicsItem
 {
 public:
-    enum { Type = UserType+2 };
+    enum { Type = UserType+3 };
 
     explicit Connection(Port& output);
     ~Connection();
