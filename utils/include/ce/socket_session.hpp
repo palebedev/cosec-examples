@@ -1,14 +1,17 @@
 #ifndef UUID_A62EF946_4125_424B_AC63_B3B73F116664
 #define UUID_A62EF946_4125_424B_AC63_B3B73F116664
 
-#include <ce/asio_ns.hpp>
+#include <ce/executor_wrapper.hpp>
+#include <ce/get_socket.hpp>
 #include <ce/utils/export.h>
 
+#include <boost/asio/execution/relationship.hpp>
 #include <boost/asio/ip/tcp.hpp>
 #include <boost/log/expressions/keyword.hpp>
 #include <boost/log/sources/severity_logger.hpp>
 #include <boost/log/trivial.hpp>
 
+#include <exception>
 #include <memory>
 #include <string_view>
 #include <type_traits>
@@ -26,45 +29,113 @@ namespace ce
         boost::log::sources::severity_logger_mt<boost::log::trivial::severity_level>;
 
     CE_UTILS_EXPORT socket_session_logger_t make_socket_session_logger(
-        const ba::ip::tcp::socket& socket);
+        const ba::ip::tcp::endpoint& endpoint);
 
     BOOST_LOG_ATTRIBUTE_KEYWORD(remote,remote_attr_name,ba::ip::tcp::socket::endpoint_type)
 
-    class socket_session_base
+    template<typename Executor>
+    class catching_executor;
+
+    class CE_UTILS_EXPORT socket_session_base
     {
     public:
         socket_session_logger_t& log() noexcept
         {
-            return log_;
+            return *log_;
         }
-    protected:
-        socket_session_logger_t log_;
 
-        explicit socket_session_base(const ba::ip::tcp::socket& socket)
-            : log_{make_socket_session_logger(socket)}
+        virtual void handle_exception(const std::exception& e);
+    protected:
+        std::optional<socket_session_logger_t> log_;
+    };
+
+    template<typename Executor>
+    class catching_executor : public executor_wrapper<catching_executor,Executor>
+    {
+    public:
+        catching_executor(Executor ex,socket_session_base& ssb) noexcept
+            : executor_wrapper<catching_executor,Executor>{std::move(ex)},
+              ssb_{&ssb}
         {}
+
+        template<typename OtherExecutor>
+        catching_executor(Executor ex,const catching_executor<OtherExecutor>& ce) noexcept
+            : catching_executor{std::move(ex),ce.session()}
+        {}
+
+        socket_session_base& session() const noexcept
+        {
+            return *ssb_;
+        }
+
+        template<typename F>
+        std::enable_if_t<bae::can_execute_v<const Executor&,F>> execute(F&& f) const
+        {
+            bae::execute(this->ex_,[ssb=ssb_,f=std::forward<F>(f)]() mutable {
+                try{
+                    std::forward<F>(f)();
+                }
+                catch(const std::exception& e){
+                    ssb->handle_exception(e);
+                }
+            });
+        }
+    private:
+        socket_session_base* ssb_;
     };
 
     // Base class for session objects that need enable_shared_from_this functionality,
-    // store a stream object and provide a logger with severity and remote endpoint attributes.
+    // store a stream object, provide a logger with severity and remote endpoint attributes and
+    // catch exceptions from default and continuation executor.
 
     template<typename Derived,
-             typename Stream = ba::ip::tcp::socket>
+             typename Stream>
     class socket_session : public std::enable_shared_from_this<Derived>,
                            public socket_session_base
     {
     public:
-        explicit socket_session(ba::ip::tcp::socket socket)
-            : socket_session_base{socket},
-              stream_{std::move(socket)}
+        using executor_type = catching_executor<typename Stream::executor_type>;
+        using stream_t = typename Stream::template rebind_executor<executor_type>::other;
+
+        template<typename... Ts>
+        socket_session(Ts&&... args) noexcept
+            : stream_{executor_type{typename Stream::executor_type{std::forward<Ts>(args)...},*this}}
         {}
 
-        Stream& stream() noexcept
+        stream_t& stream() noexcept
         {
             return stream_;
         }
+
+        void create_logger()
+        {
+            this->log_ = make_socket_session_logger(get_socket(stream_).remote_endpoint());
+        }
+
+        void start()
+        {
+            bae::execute(stream_.get_executor(),[this_=static_cast<Derived*>(this)]{
+                this_->start_protocol();
+            });
+        }
+
+        void handle_exception(const std::exception& e) override
+        {
+            socket_session_base::handle_exception(e);
+            stream_.close();
+        }
     protected:
-        Stream stream_;
+        stream_t stream_;
+
+        auto executor() noexcept
+        {
+            return stream_.get_executor();
+        }
+
+        auto cont_executor() noexcept
+        {
+            return ba::prefer(stream_.get_executor(),bae::relationship.continuation);
+        }
     };
 }
 

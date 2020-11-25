@@ -4,14 +4,17 @@
 
 namespace ce
 {
-    socket_session_logger_t make_socket_session_logger(const ba::ip::tcp::socket& socket)
+    socket_session_logger_t make_socket_session_logger(const ba::ip::tcp::endpoint& endpoint)
     {
         socket_session_logger_t logger;
         logger.add_attribute(remote_attr_name,
-            boost::log::attributes::constant<ba::ip::tcp::socket::endpoint_type>(
-                socket.remote_endpoint()
-            )
-        );
+            boost::log::attributes::constant<ba::ip::tcp::endpoint>(endpoint));
         return logger;
     } 
+
+    void socket_session_base::handle_exception(const std::exception& e)
+    {
+        BOOST_LOG_SEV(log(),boost::log::trivial::error)
+            << "Unhandled exception: " << e.what();
+    }
 }

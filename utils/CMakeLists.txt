@@ -11,7 +11,6 @@ add_library(ce-utils
     src/hex.cpp
     src/io_context_signal_interrupter.cpp
     src/socket_session.cpp
-    src/tcp_listener.cpp
 )
 
 target_compile_features(ce-utils PUBLIC cxx_std_20)
