@@ -9,6 +9,7 @@ It is assumed you have made yourself familiar with `ntc-cmake`, what it automate
 - Asynchrony:
   - `thread-pool`: simple thread pool and executor usage.
   - `asio-basic`: basic asynchronous tcp server with logging and error handling.
+  - `asio-advanced`: multi-threaded tcp server with continuations that has operation limits.
 - Qt:
   - `layouts-painting`: basic use signals/slots, Qt Designer, layouts and mouse/paint events for custom-looking widgets.
   - `item-models`: usage of Qt Item Models and Views/Widgets.
