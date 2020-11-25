@@ -1,6 +1,7 @@
 add_library(ce-utils
     include/ce/asio_ns.hpp
     include/ce/charconv.hpp
+    include/ce/executor_wrapper.hpp
     include/ce/format.hpp
     include/ce/get_socket.hpp
     include/ce/hex.hpp
