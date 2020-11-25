@@ -25,5 +25,5 @@ void ColorDelegate::paint(QPainter* painter,const QStyleOptionViewItem& option,
     painter->fillRect(option.rect,c);
     painter->setPen(c.lightnessF()>0.5?Qt::black:Qt::white);
     painter->drawText(option.rect,Qt::AlignHCenter|Qt::AlignVCenter,
-                      QStringLiteral("#%1").arg(c.rgb(),6,16,QLatin1Char('0')));
+                      QStringLiteral("#%1").arg(c.rgb()&0xffffff,6,16,QLatin1Char('0')));
 }
