@@ -2,7 +2,6 @@
 
 #include <QtCore/QDateTime>
 #include <QtGui/QColor>
-#include <qnamespace.h>
 
 FabricsModel::FabricsModel(QObject* parent)
     : QSqlTableModel{parent}
