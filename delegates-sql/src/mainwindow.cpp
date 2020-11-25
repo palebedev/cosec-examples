@@ -31,8 +31,7 @@ void MainWindow::on_newButton_clicked()
     // so fetch the whole model before calling rowCount().
     while(model_->canFetchMore())
         model_->fetchMore();
-    int rc = model_->rowCount();
-    model_->insertRow(rc);
+    model_->insertRow(model_->rowCount());
     ui_->tableView->scrollToBottom();
 }
 

@@ -25,7 +25,6 @@ Qt::ItemFlags FabricsModel::flags(const QModelIndex& index) const
 QVariant FabricsModel::data(const QModelIndex& index,int role) const
 {
     QVariant ret = QSqlTableModel::data(index,role);
-
     if(index.isValid()&&(role==Qt::DisplayRole||role==Qt::EditRole))
         switch(index.column()){
             case 2:
