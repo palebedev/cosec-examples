@@ -61,9 +61,7 @@ void Port::mouseReleaseEvent(QGraphicsSceneMouseEvent* /*event*/)
     if(!creatingConnection_)
         return;
     if(connection_->input())
-        connection_->output()->connection_ =
-            connection_->input()->connection_ =
-                connection_;
+        connection_->input()->connection_ = connection_;
     else
         delete connection_;
     creatingConnection_ = false;
