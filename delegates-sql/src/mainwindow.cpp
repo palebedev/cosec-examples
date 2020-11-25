@@ -5,9 +5,6 @@
 #include "colordelegate.hpp"
 #include "fabricsmodel.hpp"
 
-#include <algorithm>
-#include <functional>
-
 MainWindow::MainWindow(QWidget* parent)
     : QWidget{parent},
       ui_{new Ui::MainWindow},
@@ -37,16 +34,9 @@ void MainWindow::on_newButton_clicked()
 
 void MainWindow::on_deleteButton_clicked()
 {
-    // Get a descending list of row addresses so that removing them in this
-    // order doesn't invalidate them.
-    auto indices = ui_->tableView->selectionModel()->selectedRows();
-    QVector<int> rows_(indices.size());
-    std::transform(indices.begin(),indices.end(),rows_.begin(),[](const QModelIndex& i){
-        return i.row();
-    });
-    std::sort(rows_.begin(),rows_.end(),std::greater<>{});
-    for(int row:rows_)
-        model_->removeRow(row);
-    // Removing rows leaves them empty in the model, reselect to purge them.
+    // Removing rows leaves them empty in the model, so no need to sort,
+    // but we have to reselect data at the end.
+    for(const QModelIndex& mi:(ui_->tableView->selectionModel()->selectedRows()))
+        model_->removeRow(mi.row());
     model_->select();
 }
