@@ -49,7 +49,8 @@ void Port::mouseMoveEvent(QGraphicsSceneMouseEvent* event)
 {
     if(!creatingConnection_)
         return;
-    if(auto port = qgraphicsitem_cast<Port*>(scene()->itemAt(event->scenePos(),{})))
+    if(auto port = qgraphicsitem_cast<Port*>(scene()->itemAt(event->scenePos(),{}));
+            port&&port->portType()==PortType::input)
         connection_->setEnd(*port);
     else
         connection_->setEnd(event->scenePos());
