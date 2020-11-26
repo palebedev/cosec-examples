@@ -18,6 +18,7 @@ It is assumed you have made yourself familiar with `ntc-cmake`, what it automate
   - `locale-resources`: usage of resources and translations in Qt.
   - `geohash`: qtpositioning + simple use of `QNetworkAccessManager` from qtnetwork.
   - `delegates-sql`: use of queries and item models with qtsql and custom item delegates.
+  - `treeview`: tree view item model example.
 - Miscellaneous:
   - `et`: use of expression templates to optimize evaluation of expressions.
 

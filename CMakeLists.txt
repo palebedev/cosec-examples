@@ -39,6 +39,7 @@ if(Qt5_FOUND)
     add_subdirectory(locale-resources)
     add_subdirectory(geohash)
     add_subdirectory(delegates-sql)
+    add_subdirectory(treeview)
 endif()
 
 add_subdirectory(et)
