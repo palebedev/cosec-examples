@@ -21,7 +21,7 @@ namespace ce
     public:
         using inner_executor_type = Executor;
 
-        explicit executor_wrapper(Executor ex) noexcept
+        executor_wrapper(Executor ex) noexcept
             : ex_{std::move(ex)}
         {}
 
