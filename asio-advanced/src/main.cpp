@@ -1,4 +1,3 @@
-#include <boost/asio/is_executor.hpp>
 #include <ce/charconv.hpp>
 #include <ce/format.hpp>
 #include <ce/io_context_signal_interrupter.hpp>
@@ -51,7 +50,7 @@ namespace ce
         class calc_session final : public socket_session<calc_session,tcp_stream>
         {
             constexpr static std::size_t number_limit_ = 1024,
-                                        bytes_per_second_limit = 1024;
+                                         bytes_per_second_limit = 1024;
             constexpr static boost::asio::steady_timer::duration time_limit_ =
                 std::chrono::seconds(15);
         public:

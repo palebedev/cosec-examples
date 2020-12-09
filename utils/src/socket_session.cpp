@@ -10,7 +10,7 @@ namespace ce
         logger.add_attribute(remote_attr_name,
             boost::log::attributes::constant<ba::ip::tcp::endpoint>(endpoint));
         return logger;
-    } 
+    }
 
     void socket_session_base::handle_exception(const std::exception& e)
     {

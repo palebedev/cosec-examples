@@ -7,7 +7,6 @@
 #include <QtWidgets/QApplication>
 
 #include <boost/iterator/iterator_adaptor.hpp>
-#include <qnamespace.h>
 
 NotesModel::NotesModel(QObject* parent)
     : QAbstractItemModel{parent},
