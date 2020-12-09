@@ -12,6 +12,8 @@ namespace ce
         return logger;
     }
 
+    socket_session_base::~socket_session_base() = default;
+
     void socket_session_base::handle_exception(const std::exception& e)
     {
         BOOST_LOG_SEV(log(),boost::log::trivial::error)

@@ -39,6 +39,8 @@ namespace ce
     class CE_UTILS_EXPORT socket_session_base
     {
     public:
+        virtual ~socket_session_base();
+
         socket_session_logger_t& log() noexcept
         {
             return *log_;
