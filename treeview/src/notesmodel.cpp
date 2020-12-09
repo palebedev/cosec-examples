@@ -249,7 +249,7 @@ QMimeData* NotesModel::mimeData(const QModelIndexList& indexes) const
 bool NotesModel::dropMimeData(const QMimeData* data,Qt::DropAction action,int row,int column,
                               const QModelIndex& parent)
 {
-    if(!notes_||column>0||!canDropMimeData(data,action,row,column,parent)||!data->hasFormat(mimeType))
+    if(!notes_||column>0||!canDropMimeData(data,action,row,column,parent))
         return false;
     if(action==Qt::IgnoreAction)
         return true;
