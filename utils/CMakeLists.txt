@@ -7,6 +7,7 @@ add_library(ce-utils
     include/ce/hex.hpp
     include/ce/io_context_signal_interrupter.hpp
     include/ce/socket_session.hpp
+    include/ce/stdcoro.hpp
     include/ce/tcp_listener.hpp
     src/hex.cpp
     src/io_context_signal_interrupter.cpp
