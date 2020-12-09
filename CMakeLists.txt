@@ -31,6 +31,7 @@ add_subdirectory(asio-main)
 add_subdirectory(asio-basic)
 add_subdirectory(asio-advanced)
 add_subdirectory(asio-shared)
+add_subdirectory(generator)
 
 if(Qt5_FOUND)
     add_subdirectory(layouts-painting)
