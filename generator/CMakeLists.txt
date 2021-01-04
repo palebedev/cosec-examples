@@ -3,6 +3,7 @@ add_executable(generator
     src/main.cpp
 )
 target_compile_features(generator PRIVATE cxx_std_20)
+target_compile_options(generator PRIVATE "-fcoroutines")
 
 target_link_libraries(generator PRIVATE ce::utils Boost::headers)
 
