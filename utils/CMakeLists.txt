@@ -19,7 +19,6 @@ target_compile_features(ce-utils PUBLIC cxx_std_20)
 target_link_libraries(ce-utils PUBLIC
     Boost::chrono
     Boost::log
-    Boost::system
     Boost::thread
 )
 

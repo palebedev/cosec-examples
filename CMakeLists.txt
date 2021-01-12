@@ -9,7 +9,7 @@ project(cosec-examples
 find_package(ntc-cmake 1.1.0 REQUIRED)
 include(ntc-dev-build)
 
-find_package(Boost 1.74 REQUIRED COMPONENTS chrono container log system thread)
+find_package(Boost 1.74 REQUIRED COMPONENTS chrono container log thread)
 find_package(benchmark 1.5.0)
 # Flatbuffers package provides no version info.
 find_package(Flatbuffers)
