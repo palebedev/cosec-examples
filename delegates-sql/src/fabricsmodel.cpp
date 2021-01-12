@@ -28,7 +28,7 @@ QVariant FabricsModel::data(const QModelIndex& index,int role) const
     if(index.isValid()&&(role==Qt::DisplayRole||role==Qt::EditRole))
         switch(index.column()){
             case 2:
-                ret = QColor::fromRgb(ret.value<qlonglong>());
+                ret = QColor::fromRgb(ret.value<quint32>());
                 break;
             case 3:
                 ret = QDateTime::fromSecsSinceEpoch(ret.value<qlonglong>());

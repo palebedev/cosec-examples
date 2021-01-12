@@ -28,7 +28,7 @@ QRectF Port::boundingRect() const
     return BlockMetrics::get().portRect();
 }
 
-void Port::paint(QPainter* painter,const QStyleOptionGraphicsItem* option,QWidget* /*widget*/)
+void Port::paint(QPainter* painter,const QStyleOptionGraphicsItem* /*option*/,QWidget* /*widget*/)
 {
     auto& bm = BlockMetrics::get();
     painter->setPen(bm.normalPen());

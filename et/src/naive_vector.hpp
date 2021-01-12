@@ -49,8 +49,9 @@ namespace naive
         assert(v1.size()==v2.size());
         std::transform(std::move_iterator{v1.begin()},std::move_iterator{v1.end()},
                        v2.begin(),v1.begin(),std::plus{});
-        // Since C++20, rvalue reference are also implicitly moveable from for return.
-        return v1;
+        // FIXME: Since C++20, rvalue reference are also implicitly moveable from for return,
+        // but clang doesn't implement this yet.
+        return std::move(v1);
     }
 
     // In general we can't assume operator+ is commutative,
