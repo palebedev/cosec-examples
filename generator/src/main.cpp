@@ -8,7 +8,7 @@ namespace
     {
         int a = 1,b = 1;
         for(;;){
-            co_yield a;
+            co_yield +a;
             a = std::exchange(b,a+b);
         }
     }

@@ -3,9 +3,8 @@
 
 #include <ce/stdcoro.hpp>
 
-#include <boost/iterator/iterator_facade.hpp>
+#include <boost/stl_interfaces/iterator_interface.hpp>
 
-#include <optional>
 #include <utility>
 
 namespace ce
@@ -29,9 +28,9 @@ namespace ce
                 return {};
             }
 
-            stdcoro::suspend_always yield_value(T value) noexcept
+            stdcoro::suspend_always yield_value(T&& value) noexcept
             {
-                current_value_ = std::move(value);
+                current_value_ = &value;
                 return {};
             }
 
@@ -52,39 +51,40 @@ namespace ce
         private:
             friend iterator;
 
-            std::optional<T> current_value_;
+            T* current_value_;
         };
 
-        class iterator : public boost::iterator_facade<iterator,T,boost::single_pass_traversal_tag>
+        class iterator : public boost::stl_interfaces::iterator_interface<
+            iterator,std::input_iterator_tag,T>
         {
         public:
             iterator() noexcept = default;
-        private:
-            friend boost::iterator_core_access;
-            friend generator;
 
-            stdcoro::coroutine_handle<promise_type>* handle_;
-
-            iterator(stdcoro::coroutine_handle<promise_type>& handle) noexcept
-                : handle_{&handle}
-            {}
-
-            void increment()
+            iterator& operator++()
             {
                 handle_->resume();
                 if(handle_->done())
                     handle_ = {};
+                return *this;
             }
 
-            bool equal(const iterator& other) const noexcept
+            bool operator==(const iterator& other) const
             {
                 return handle_==other.handle_;
             }
 
-            T& dereference() const noexcept
+            T& operator*() const noexcept
             {
                 return *handle_->promise().current_value_;
             }
+        private:
+            friend generator;
+
+            stdcoro::coroutine_handle<promise_type>* handle_ = nullptr;
+
+            iterator(stdcoro::coroutine_handle<promise_type>& handle) noexcept
+                : handle_{&handle}
+            {}
         };
 
         generator(generator&& other) noexcept
@@ -105,7 +105,7 @@ namespace ce
             clear();
         }
 
-        iterator begin() noexcept
+        iterator begin()
         {
             handle_.resume();
             return {handle_};
@@ -119,7 +119,7 @@ namespace ce
         stdcoro::coroutine_handle<promise_type> handle_;
 
         generator(promise_type& promise) noexcept
-        : handle_{stdcoro::coroutine_handle<promise_type>::from_promise(promise)}
+            : handle_{stdcoro::coroutine_handle<promise_type>::from_promise(promise)}
         {}
 
         void clear() noexcept
