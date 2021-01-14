@@ -83,16 +83,11 @@ namespace ce
                             fiber_data_executor_part<Executor>,
                             fiber_data_handler_part<Handler>
         {
-// FIXME: Before parenthesized initialization of aggregates (C++20 feature)
-//        is supported by clang, this class needs a constructor
-//        to be useable with std::construct_at.
-#if !defined(__cpp_aggregate_paren_init)||__cpp_aggregate_paren_init<201902
             fiber_data(boost::context::fiber f,Executor ex,Handler h)
                 : fiber_data_base{std::move(f)},
                   fiber_data_executor_part<Executor>{std::move(ex)},
                   fiber_data_handler_part<Handler>{std::move(h)}
             {}
-#endif
         };
 
         // We will store fiber_data at the top of the stack that is allocated for
