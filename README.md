@@ -10,6 +10,7 @@ It is assumed you have made yourself familiar with `ntc-cmake`, what it automate
   - `thread-pool`: simple thread pool and executor usage.
   - `asio-basic`: basic asynchronous tcp server with logging and error handling.
   - `asio-advanced`: multi-threaded tcp server with continuations that has operation limits.
+  - `asio-stackfull-coro`: tcp server that uses stackfull coroutines based on Boost.Context.
   - `asio-shared`: server with shared state which uses strands for synchronization.
   - `generator`: synchronous generator based on C++20 coroutines.
 - Qt:

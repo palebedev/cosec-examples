@@ -9,7 +9,7 @@ project(cosec-examples
 find_package(ntc-cmake 1.1.0 REQUIRED)
 include(ntc-dev-build)
 
-find_package(Boost 1.74 REQUIRED COMPONENTS chrono container log thread)
+find_package(Boost 1.74 REQUIRED COMPONENTS chrono container context log thread)
 find_package(benchmark 1.5.0)
 # Flatbuffers package provides no version info.
 find_package(Flatbuffers)
@@ -31,6 +31,7 @@ add_subdirectory(asio-main)
 add_subdirectory(asio-basic)
 add_subdirectory(asio-advanced)
 add_subdirectory(asio-shared)
+add_subdirectory(asio-stackfull-coro)
 add_subdirectory(generator)
 
 if(Qt5_FOUND)

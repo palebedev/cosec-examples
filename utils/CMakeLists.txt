@@ -7,6 +7,7 @@ add_library(ce-utils
     include/ce/hex.hpp
     include/ce/io_context_signal_interrupter.hpp
     include/ce/socket_session.hpp
+    include/ce/spawn.hpp
     include/ce/stdcoro.hpp
     include/ce/tcp_listener.hpp
     src/hex.cpp
@@ -18,6 +19,7 @@ target_compile_features(ce-utils PUBLIC cxx_std_20)
 
 target_link_libraries(ce-utils PUBLIC
     Boost::chrono
+    Boost::context
     Boost::log
     Boost::thread
 )
