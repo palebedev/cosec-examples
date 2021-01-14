@@ -81,14 +81,7 @@ namespace ce
         template<typename Executor,typename Handler>
         struct fiber_data : fiber_data_base,
                             fiber_data_executor_part<Executor>,
-                            fiber_data_handler_part<Handler>
-        {
-            fiber_data(boost::context::fiber f,Executor ex,Handler h)
-                : fiber_data_base{std::move(f)},
-                  fiber_data_executor_part<Executor>{std::move(ex)},
-                  fiber_data_handler_part<Handler>{std::move(h)}
-            {}
-        };
+                            fiber_data_handler_part<Handler> {};
 
         // We will store fiber_data at the top of the stack that is allocated for
         // the coroutine. This allows to avoid any extra allocations. This makes for
@@ -169,10 +162,7 @@ namespace ce
             auto fd = reinterpret_cast<fiber_data_t*>(
                 reinterpret_cast<std::uintptr_t>(top-sizeof(fiber_data_t))
                     &~(alignof(fiber_data_t)-1));
-            // We construct fiber_data at the calculated position.
-            // construct_at is equivalent to placement new, but along
-            // with destruct at is usable in constant expressions.
-            // (As with destroy_at, we're only using it here for clarity).
+            // FIXME: use construct_at when supported by released libc++.
             // Since we've allocated and modified stack already, we
             // use an overload of fiber constructor that takes stack
             // as a preallocated structure with the new sp, size and original
@@ -183,7 +173,7 @@ namespace ce
             // they've already taken ownership of the stack and its allocator
             // and properly deallocate it before emitting the exception,
             // so there's no need to guard against this.
-            std::construct_at(fd,boost::context::fiber{std::allocator_arg,
+            new (fd) fiber_data_t{{boost::context::fiber{std::allocator_arg,
                 boost::context::preallocated{
                     fd,
                     stack_ctx.size-size_t(top-reinterpret_cast<char*>(fd)),
@@ -256,7 +246,7 @@ namespace ce
                     // forced_unwind exception instance itself.
                     return std::move(fd->f_);
                 }
-            },ex,std::move(handler));
+            }},{ex},{std::move(handler)}};
             // After coroutine creation is done, we execute its startup on
             // its executor. To prevent its leak if the handler is destroyed
             // without execution, we use a special smart pointer we prepared before.
