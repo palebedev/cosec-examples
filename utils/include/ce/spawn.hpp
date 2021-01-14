@@ -162,7 +162,6 @@ namespace ce
             auto fd = reinterpret_cast<fiber_data_t*>(
                 reinterpret_cast<std::uintptr_t>(top-sizeof(fiber_data_t))
                     &~(alignof(fiber_data_t)-1));
-            // FIXME: use construct_at when supported by released libc++.
             // Since we've allocated and modified stack already, we
             // use an overload of fiber constructor that takes stack
             // as a preallocated structure with the new sp, size and original
