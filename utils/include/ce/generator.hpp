@@ -107,8 +107,7 @@ namespace ce
 
         iterator begin()
         {
-            handle_.resume();
-            return {handle_};
+            return std::next(iterator{handle_});
         }
 
         iterator end() noexcept

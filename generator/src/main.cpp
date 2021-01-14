@@ -1,4 +1,4 @@
-#include "generator.hpp"
+#include <ce/generator.hpp>
 
 #include <iostream>
 

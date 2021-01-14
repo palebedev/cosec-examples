@@ -1,5 +1,4 @@
 add_executable(generator
-    src/generator.hpp
     src/main.cpp
 )
 target_compile_features(generator PRIVATE cxx_std_20)
