@@ -33,6 +33,9 @@ constexpr T multiplicative_inverse(T x)
     return T(1)/x;
 }
 
+template<typename T>
+using multiplicative_inverse_result_t = decltype(multiplicative_inverse(std::declval<T>()));
+
 // A trait that figures out if multiplication_inverse is callable for given T.
 
 template<typename T,typename = void>
@@ -40,7 +43,7 @@ struct has_multiplicative_inverse : std::false_type {};
 
 template<typename T>
 struct has_multiplicative_inverse<T,
-    std::void_t<decltype(multiplicative_inverse(std::declval<T>()))>> : std::true_type {};
+    std::void_t<multiplicative_inverse_result_t<T>>> : std::true_type {};
 
 template<typename T>
 constexpr inline bool has_multiplicative_inverse_v = has_multiplicative_inverse<T>{};

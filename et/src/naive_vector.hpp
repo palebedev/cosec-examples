@@ -93,7 +93,7 @@ namespace naive
         assert(v1.size()==v2.size());
         std::transform(std::move_iterator{v1.begin()},std::move_iterator{v1.end()},
                        v2.begin(),v1.begin(),std::minus{});
-        return v1;
+        return std::move(v1);
     }
 
     template<typename T,typename U,
@@ -109,7 +109,7 @@ namespace naive
              typename = can_reuse_for_t<T,std::minus<>,T,T>>
     vec_result_t<std::minus<>,T,T> operator-(vector<T>&& v1,vector<T>&& v2)
     {
-        return std::move(v1)+v2;
+        return std::move(v1)-v2;
     }
 
     // Not a universal reference for scalar, since we could only steal it for the last element

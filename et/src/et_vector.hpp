@@ -48,9 +48,8 @@ namespace et
                 : x_{std::forward<T>(x)},
                   y_{std::forward<U>(y)}
             {
-                // Either both have same size, or exactly one is a scalar.
-                assert(x_.size()==y_.size()||
-                       (x_.size()==1)!=(y_.size()==1));
+                // Either both have same size, or one is a scalar.
+                assert(x_.size()==y_.size()||x_.size()==1||y_.size()==1);
             }
 
             std::size_t size() const noexcept
@@ -68,24 +67,28 @@ namespace et
 
             operator vector<vector_et_elem_t>() &&
             {
-                vector<vector_et_elem_t> ret;
+                auto calc = [this](vector<vector_et_elem_t>& ret) mutable {
+                    std::generate(ret.begin(),ret.end(),[this,i=std::size_t{}]() mutable {
+                        return std::move(*this)[i++];
+                    });
+                };
                 auto&& stolen = std::move(*this).steal();
-                if constexpr(std::is_same_v<decltype(stolen),vector<vector_et_elem_t>&&>)
-                    ret = std::move(stolen);
-                else
-                    ret.resize(size(),boost::container::default_init);
-                std::generate(ret.begin(),ret.end(),[this,i=std::size_t{}]() mutable {
-                    return std::move(*this)[i++];
-                });
-                return ret;
+                if constexpr(std::is_same_v<decltype(stolen),vector<vector_et_elem_t>&&>){
+                    calc(stolen);
+                    return std::move(stolen);
+                }else{
+                    vector<vector_et_elem_t> ret{size(),boost::container::default_init};
+                    calc(ret);
+                    return ret;
+                }
             }
 
             template<typename Res = vector_et_elem_t>
             decltype(auto) steal() &&
             {
-                if constexpr(std::is_same_v<T,vector<Res>>)
+                if constexpr(std::is_same_v<T,vector<Res>&&>)
                     return std::move(x_);
-                else if constexpr(std::is_same_v<U,vector<Res>>)
+                else if constexpr(std::is_same_v<U,vector<Res>&&>)
                     return std::move(y_);
                 else if constexpr(is_vector_et_node_v<T>){
                     auto&& ret = std::move(x_).template steal<Res>();
@@ -98,8 +101,8 @@ namespace et
                     return nullptr;
             }
         private:
-            T&& x_;
-            U&& y_;
+            T x_;
+            U y_;
         };
 
         template<typename T>
@@ -108,8 +111,8 @@ namespace et
         public:
             using vector_et_elem_t = const T&;
 
-            scalar_wrapper(const T& x) noexcept
-                : x_{x}
+            scalar_wrapper(T x) noexcept
+                : x_{std::move(x)}
             {}
 
             constexpr static std::size_t size() noexcept
@@ -122,7 +125,7 @@ namespace et
                 return x_;
             }
         private:
-            const T& x_;
+            T x_;
         };
 
         template<typename Op,typename T,typename U>
@@ -138,46 +141,51 @@ namespace et
 
     template<typename T,typename U,
              typename = detail::op_result_vv_t<std::plus<>,T,U>>
-    detail::vector_et_node<std::plus<>,T,U> operator+(T&& x,U&& y)
+    detail::vector_et_node<std::plus<>,T&&,U&&> operator+(T&& x,U&& y) noexcept
     {
         return {std::forward<T>(x),std::forward<U>(y)};
     }
 
     template<typename T,typename U,
              typename = detail::op_result_vv_t<std::minus<>,T,U>>
-    detail::vector_et_node<std::minus<>,T,U> operator-(T&& x,U&& y)
+    detail::vector_et_node<std::minus<>,T&&,U&&> operator-(T&& x,U&& y) noexcept
     {
         return {std::forward<T>(x),std::forward<U>(y)};
     }
 
     template<typename T,typename U,
              typename = detail::op_result_vs_t<std::multiplies<>,T,const U&>>
-    detail::vector_et_node<std::multiplies<>,T,detail::scalar_wrapper<U>> operator*(T&& x,const U& y)
+    detail::vector_et_node<std::multiplies<>,T&&,detail::scalar_wrapper<const U&>>
+        operator*(T&& x,const U& y) noexcept
     {
-        return {std::forward<T>(x),detail::scalar_wrapper(y)};
+        return {std::forward<T>(x),{y}};
     }
 
     template<typename T,typename U,
              typename = detail::op_result_sv_t<std::multiplies<>,const T&,U>>
-    detail::vector_et_node<std::multiplies<>,detail::scalar_wrapper<T>,U> operator*(const T& x,U&& y)
+    detail::vector_et_node<std::multiplies<>,detail::scalar_wrapper<const T&>,U&&>
+        operator*(const T& x,U&& y) noexcept
     {
-        return {detail::scalar_wrapper(x),std::forward<U>(y)};
-    }
-
-    template<typename T,typename U,
-             typename = std::enable_if_t<has_multiplicative_inverse_v<U>>>
-    auto operator/(T&& x,const U& y) -> decltype(x*multiplicative_inverse(y))
-    {
-        return x*multiplicative_inverse(y);
+        return {{x},std::forward<U>(y)};
     }
 
     template<typename T,typename U,
              typename = detail::op_result_vs_t<std::multiplies<>,T,
-                decltype(multiplicative_inverse(std::declval<U>()))>,
-             typename = std::enable_if_t<!has_multiplicative_inverse_v<U>>>
-    detail::vector_et_node<std::divides<>,T,detail::scalar_wrapper<U>> operator/(T&& x,const U& y)
+                                               multiplicative_inverse_result_t<U>>>
+    detail::vector_et_node<std::multiplies<>,T&&,
+                           detail::scalar_wrapper<multiplicative_inverse_result_t<U>>>
+        operator/(T&& x,const U& y)
     {
-        return {std::forward<T>(x),detail::scalar_wrapper(y)};
+        return {std::forward<T>(x),{multiplicative_inverse(y)}};
+    }
+
+    template<typename T,typename U,
+             typename = detail::op_result_vs_t<std::multiplies<>,T,const U&>,
+             typename = std::enable_if_t<!has_multiplicative_inverse_v<U>>>
+    detail::vector_et_node<std::divides<>,T&&,detail::scalar_wrapper<const U&>>
+        operator/(T&& x,const U& y) noexcept
+    {
+        return {std::forward<T>(x),{y}};
     }
 }
 
