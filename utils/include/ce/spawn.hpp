@@ -33,7 +33,7 @@ namespace ce
 
     namespace detail
     {
-        // Instance of fiber_data class template hold all the state of the coroutine.
+        // Instance of fiber_data class template holds all the state of the coroutine.
         // It is split into several inherited bases to reduce duplication
         // among various instantiations. The state consists of:
         // - fiber object, that stores our coroutine when it's suspended
