@@ -18,7 +18,7 @@
 
 namespace ce
 {
-    CE_UTILS_EXPORT constexpr inline const char* remote_attr_name = "Remote";
+    constexpr inline const char* remote_attr_name = "Remote";
 
     // In many cases, especially when using boost::beast::tcp_stream,
     // we're guaranteed to be operating under strand and never using log
