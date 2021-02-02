@@ -20,6 +20,10 @@ target_link_libraries(asio-utils PUBLIC
     Boost::thread
 )
 
+if(WIN32)
+    target_link_libraries(asio-utils PUBLIC ws2_32 mswsock)
+endif()
+
 ntc_target(asio-utils ALIAS_NAME ce::asio-utils HEADER_PREFIX ce/asio-utils/)
 
 add_library(asio-main OBJECT src/main.cpp)

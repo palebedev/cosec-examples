@@ -1,15 +1,20 @@
 add_library(ce-utils
     include/ce/charconv.hpp
     include/ce/errno.hpp
-    include/ce/file_descriptor.hpp
     include/ce/format.hpp
     include/ce/generator.hpp
     include/ce/hex.hpp
-    include/ce/pipe.hpp
     include/ce/stdcoro.hpp
-    src/file_descriptor.cpp
     src/hex.cpp
 )
+
+if(NOT WIN32)
+    target_sources(ce-utils PRIVATE
+        include/ce/file_descriptor.hpp
+        include/ce/pipe.hpp
+        src/file_descriptor.cpp
+    )
+endif()
 
 target_compile_features(ce-utils PUBLIC cxx_std_20)
 
