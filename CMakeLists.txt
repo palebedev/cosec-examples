@@ -27,7 +27,7 @@ endif()
 
 add_subdirectory(utils)
 add_subdirectory(thread-pool)
-add_subdirectory(asio-main)
+add_subdirectory(asio-utils)
 add_subdirectory(asio-basic)
 add_subdirectory(asio-advanced)
 add_subdirectory(asio-shared)

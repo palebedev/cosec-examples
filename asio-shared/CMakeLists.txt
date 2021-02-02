@@ -6,9 +6,6 @@ add_executable(asio-shared
     src/main.cpp
 )
 
-target_link_libraries(asio-shared PRIVATE
-    ce::asio-main
-    ce::utils
-)
+target_link_libraries(asio-shared PRIVATE ce::asio-main)
 
 ntc_target(asio-shared)
