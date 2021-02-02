@@ -1,7 +1,7 @@
 #ifndef UUID_7B5C2BE2_7375_4527_AAE7_55EDAE50C1BB
 #define UUID_7B5C2BE2_7375_4527_AAE7_55EDAE50C1BB
 
-#include "file_descriptor.hpp"
+#include <ce/file_descriptor.hpp>
 
 #include <knem_io.h>
 
@@ -13,7 +13,7 @@
 
 #include <span>
 
-class knem : public file_descriptor
+class knem : public ce::file_descriptor
 {
 public:
     class read_region
@@ -62,7 +62,7 @@ public:
     };
 
     knem()
-        : file_descriptor{open(KNEM_DEVICE_FILENAME,O_RDWR),"knem:open"}
+        : ce::file_descriptor{open(KNEM_DEVICE_FILENAME,O_RDWR),"knem:open"}
     {}
 
     read_region create_read_region(std::span<const std::byte> data)
@@ -73,7 +73,7 @@ public:
             .iovec_nr = 1,
             .protection = PROT_READ
         };
-        throw_errno_if_negative(ioctl(fd_,KNEM_CMD_CREATE_REGION,&ccr),"knem:ioctl(CREATE_REGION)");
+        ce::throw_errno_if_negative(ioctl(fd_,KNEM_CMD_CREATE_REGION,&ccr),"knem:ioctl(CREATE_REGION)");
         return read_region{*this,ccr.cookie};
     }
 
@@ -87,7 +87,7 @@ public:
             .remote_cookie = cookie,
             .remote_offset = offset,
         };
-        throw_errno_if_negative(ioctl(fd_,KNEM_CMD_INLINE_COPY,&ic),"knem:ioctl(INLINE_COPY)");
+        ce::throw_errno_if_negative(ioctl(fd_,KNEM_CMD_INLINE_COPY,&ic),"knem:ioctl(INLINE_COPY)");
     }
 };
 

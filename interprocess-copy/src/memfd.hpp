@@ -1,7 +1,7 @@
 #ifndef UUID_08FC25FF_C5AD_4DF9_991D_3DA9C63B8A61
 #define UUID_08FC25FF_C5AD_4DF9_991D_3DA9C63B8A61
 
-#include "file_descriptor.hpp"
+#include <ce/file_descriptor.hpp>
 
 #include <sys/mman.h>
 #include <sys/types.h>
@@ -14,7 +14,7 @@
 // but we use memfd to potentially use sealing (which we don't
 // in this example).
 
-class memfd : public file_descriptor
+class memfd : public ce::file_descriptor
 {
 public:
     class mapping
@@ -68,16 +68,16 @@ public:
     };
 
     memfd(std::size_t size,const char* name = "anonymous")
-        : file_descriptor{memfd_create(name,0),"memfd_create"}
+        : ce::file_descriptor{memfd_create(name,0),"memfd_create"}
     {
-        throw_errno_if_negative(ftruncate(fd_,off_t(size)),"memfd:ftruncate");
+        ce::throw_errno_if_negative(ftruncate(fd_,off_t(size)),"memfd:ftruncate");
     }
 
     mapping map(std::size_t offset,std::size_t length)
     {
         void* ret = mmap(nullptr,length,PROT_READ|PROT_WRITE,MAP_SHARED,fd_,off_t(offset));
         if(ret==MAP_FAILED)
-            throw_errno("memfd:mmap");
+            ce::throw_errno("memfd:mmap");
         return mapping{static_cast<std::byte*>(ret),length};
     }
 };

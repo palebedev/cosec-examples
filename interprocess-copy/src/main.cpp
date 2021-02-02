@@ -9,8 +9,8 @@
 #include "knem.hpp"
 #endif
 #include "memfd.hpp"
-#include "pipe.hpp"
-#include "utils.hpp"
+
+#include <ce/pipe.hpp>
 
 #include <benchmark/benchmark.h>
 
@@ -31,7 +31,7 @@ namespace
     event event_to_child,event_to_parent;
     memfd shmem{data_size};
     std::optional<memfd::mapping> mapping;
-    class pipe data_pipe;
+    ce::pipe data_pipe;
 #if HAVE_KNEM
     knem knem_file;
     knem_cookie_t parent_cookie;
@@ -75,14 +75,14 @@ namespace
         auto n = std::size_t(state.range());
         for(auto _ : state){
             event_to_child.write(pipe_op|n);
-            data_pipe.write({data.data(),n});
+            data_pipe[1].write_as_single({data.data(),n});
             event_to_parent.read();
         }
     }
 
     void pipe_child(uint64_t n)
     {
-        data_pipe.read({data.data(),std::size_t(n)});
+        data_pipe[0].read_as_chunks({data.data(),std::size_t(n)});
         event_to_parent.write();
     }
 
@@ -92,7 +92,7 @@ namespace
         for(auto _ : state){
             struct iovec iv = {data.data(),n};
             ssize_t ret = process_vm_writev(fork_->child_pid(),&iv,1,&iv,1,0);
-            throw_errno_if_negative(ret,"process_vm_write");
+            ce::throw_errno_if_negative(ret,"process_vm_write");
             if(std::size_t(ret)!=n)
                 throw std::runtime_error("invalid process_vm_write count");
             event_to_child.write(vm_write_op|n);
@@ -155,7 +155,8 @@ int main(int argc,char* argv[])
             // Parent code
 #if HAVE_KNEM
             auto region = knem_file.create_read_region(data);
-            data_pipe.write({reinterpret_cast<const std::byte*>(&region.cookie()),sizeof(knem_cookie_t)});
+            data_pipe[1].write_as_single({reinterpret_cast<const std::byte*>(&region.cookie()),
+                                          sizeof(knem_cookie_t)});
 #endif
             // Benchmark
             benchmark::Initialize(&argc,argv);
@@ -166,7 +167,8 @@ int main(int argc,char* argv[])
         }else{
             // Child code
 #if HAVE_KNEM
-            data_pipe.read({reinterpret_cast<std::byte*>(&parent_cookie),sizeof parent_cookie});
+            data_pipe[0].read_as_single({reinterpret_cast<std::byte*>(&parent_cookie),
+                                         sizeof parent_cookie});
 #endif
             // Benchmark counterpart
             for(;;){

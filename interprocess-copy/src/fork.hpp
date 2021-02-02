@@ -1,7 +1,7 @@
 #ifndef UUID_88E8E365_9FC7_4188_9784_CD5F0B417DE1
 #define UUID_88E8E365_9FC7_4188_9784_CD5F0B417DE1
 
-#include "utils.hpp"
+#include <ce/errno.hpp>
 
 #include <sys/types.h>
 #include <sys/wait.h>
@@ -20,7 +20,7 @@ public:
         // We expect to not be constructed during exception handling,
         // see destructor.
         assert(!std::uncaught_exceptions());
-        throw_errno_if_negative(child_pid_,"fork");
+        ce::throw_errno_if_negative(child_pid_,"fork");
     }
 
     fork(fork&& other) noexcept
