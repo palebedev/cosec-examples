@@ -1,9 +1,9 @@
 #ifndef UUID_A62EF946_4125_424B_AC63_B3B73F116664
 #define UUID_A62EF946_4125_424B_AC63_B3B73F116664
 
+#include <ce/asio-utils/export.h>
 #include <ce/executor_wrapper.hpp>
 #include <ce/get_socket.hpp>
-#include <ce/utils/export.h>
 
 #include <boost/asio/execution/relationship.hpp>
 #include <boost/asio/ip/tcp.hpp>
@@ -28,7 +28,7 @@ namespace ce
     using socket_session_logger_t =
         boost::log::sources::severity_logger_mt<boost::log::trivial::severity_level>;
 
-    CE_UTILS_EXPORT socket_session_logger_t make_socket_session_logger(
+    ASIO_UTILS_EXPORT socket_session_logger_t make_socket_session_logger(
         const ba::ip::tcp::endpoint& endpoint);
 
     BOOST_LOG_ATTRIBUTE_KEYWORD(remote,remote_attr_name,ba::ip::tcp::socket::endpoint_type)
@@ -36,7 +36,7 @@ namespace ce
     template<typename Executor>
     class catching_executor;
 
-    class CE_UTILS_EXPORT socket_session_base
+    class ASIO_UTILS_EXPORT socket_session_base
     {
     public:
         virtual ~socket_session_base();
