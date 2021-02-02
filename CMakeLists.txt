@@ -32,6 +32,7 @@ add_subdirectory(asio-basic)
 add_subdirectory(asio-advanced)
 add_subdirectory(asio-shared)
 add_subdirectory(asio-stackfull-coro)
+add_subdirectory(select)
 add_subdirectory(generator)
 
 if(Qt5_FOUND)
