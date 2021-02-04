@@ -59,12 +59,7 @@ namespace ce
         size_t read_as_chunks(std::span<std::byte> buf);
         size_t write_as_chunks(std::span<const std::byte> buf);
 
-        void set_non_blocking()
-        {
-            int ret = fcntl(fd_,F_GETFL,0);
-            throw_errno_if_negative(ret,"fcntl:F_GETFL");
-            throw_errno_if_negative(fcntl(fd_,F_SETFL,ret|O_NONBLOCK),"fcntl:F_SETFL:O_NONBLOCK");
-        }
+        void set_non_blocking();
     protected:
         int fd_;
     private:

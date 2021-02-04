@@ -61,4 +61,11 @@ namespace ce
         }
         return done;
     }
+
+    void file_descriptor::set_non_blocking()
+    {
+        int ret = fcntl(fd_,F_GETFL,0);
+        throw_errno_if_negative(ret,"fcntl:F_GETFL");
+        throw_errno_if_negative(fcntl(fd_,F_SETFL,ret|O_NONBLOCK),"fcntl:F_SETFL:O_NONBLOCK");
+    }
 }
