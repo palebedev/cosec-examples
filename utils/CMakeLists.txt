@@ -1,11 +1,14 @@
 add_library(ce-utils
+    include/ce/aligned_allocator.hpp
     include/ce/charconv.hpp
     include/ce/errno.hpp
     include/ce/format.hpp
     include/ce/generator.hpp
     include/ce/hex.hpp
+    include/ce/random.hpp
     include/ce/stdcoro.hpp
     src/hex.cpp
+    src/random.cpp
 )
 
 if(NOT WIN32)

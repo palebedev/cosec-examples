@@ -15,6 +15,9 @@ It is assumed you have made yourself familiar with `ntc-cmake`, what it automate
   - `atomic`: a small example on atomic usage.
   - `select`: server that implements basic asynchronous primitives using `select` reactor.
   - `generator`: synchronous generator based on C++20 coroutines.
+- Assembler:
+  - `asm-basic`: basic usage of inline assembly and assembler modules.
+  - `anf`: usage of SSE intrinsic functions.
 - Qt:
   - `layouts-painting`: basic use signals/slots, Qt Designer, layouts and mouse/paint events for custom-looking widgets.
   - `item-models`: usage of Qt Item Models and Views/Widgets.

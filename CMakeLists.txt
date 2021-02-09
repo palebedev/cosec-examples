@@ -25,6 +25,14 @@ check_cxx_source_compiles("
     int main() {}
     " X86_64
 )
+if(X86_64)
+    check_cxx_source_compiles("
+        #ifndef __AVX2__
+        #error Not AVX2!
+        #endif
+        int main() {}
+        " HAVE_AVX2)
+endif()
 
 if(Flatbuffers_FOUND)
     add_subdirectory(schema-serial)
@@ -50,6 +58,7 @@ add_subdirectory(generator)
 if(X86_64)
     add_subdirectory(asm-basic)
 endif()
+add_subdirectory(anf)
 
 if(Qt5_FOUND)
     add_subdirectory(layouts-painting)
