@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.16)
 project(cosec-examples
     DESCRIPTION "Examples for COSEC students"
     VERSION 0.0.0
-    LANGUAGES CXX
+    LANGUAGES CXX ASM
 )
 
 find_package(ntc-cmake 1.1.0 REQUIRED)
@@ -14,6 +14,17 @@ find_package(benchmark 1.5.0)
 # Flatbuffers package provides no version info.
 find_package(Flatbuffers)
 find_package(Qt5 5.15 COMPONENTS LinguistTools Network Positioning Sql Svg WebEngineWidgets)
+
+include(CheckCXXSourceCompiles)
+# CMAKE_SYSTEM_PROCESSOR is not normalized between
+# different operating systems.
+check_cxx_source_compiles("
+    #if !defined(__x86_64__)&&!defined(_M_X64)
+    #error Not x86-64!
+    #endif
+    int main() {}
+    " X86_64
+)
 
 if(Flatbuffers_FOUND)
     add_subdirectory(schema-serial)
@@ -35,6 +46,10 @@ add_subdirectory(asio-stackfull-coro)
 add_subdirectory(atomic)
 add_subdirectory(select)
 add_subdirectory(generator)
+
+if(X86_64)
+    add_subdirectory(asm-basic)
+endif()
 
 if(Qt5_FOUND)
     add_subdirectory(layouts-painting)
