@@ -1,5 +1,7 @@
 #include "select_reactor.hpp"
 
+#include <cassert>
+
 #include <sys/select.h>
 
 void select_reactor::run()
@@ -59,7 +61,7 @@ void select_reactor::run()
                             // no more, we can break both loops.
                             goto done;
                     }
-done:   
+done:
         ;
     }
 }
