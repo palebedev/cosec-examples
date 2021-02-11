@@ -19,9 +19,9 @@ thread_pool::thread_pool(unsigned threads)
             std::unique_lock lock{mutex_};
             for(;;){
                 queue_not_empty_.wait(lock,[this]{
-                    return !tasks_.empty()||stopping_.test(std::memory_order::acquire);
+                    return !tasks_.empty()||stopping_.load(std::memory_order::acquire);
                 });
-                if(stopping_.test(std::memory_order::acquire))
+                if(stopping_.load(std::memory_order::acquire))
                     return;
                 auto task = std::move(tasks_.front());
                 tasks_.pop();
@@ -30,7 +30,7 @@ thread_pool::thread_pool(unsigned threads)
                 do{
                     task();
                     task = std::move(deferred_task);
-                }while(!stopping_.test(std::memory_order::acquire)&&task);
+                }while(!stopping_.load(std::memory_order::acquire)&&task);
                 lock.lock();
                 if(!--busy_workers_)
                     no_busy_workers_.notify_all();
@@ -47,11 +47,11 @@ void thread_pool::join()
 {
     {
         std::unique_lock lock{mutex_};
-        if(!stopping_.test(std::memory_order::acquire)){
+        if(!stopping_.load(std::memory_order::acquire)){
             no_busy_workers_.wait(lock,[this]{
                 return !busy_workers_;
             });
-            stopping_.test_and_set(std::memory_order::release);
+            stopping_.store(true,std::memory_order::release);
             queue_not_empty_.notify_all();
         }
     }
@@ -63,13 +63,13 @@ void thread_pool::stop()
 {
     std::lock_guard lock{mutex_};
     tasks_ = {};
-    stopping_.test_and_set(std::memory_order::release);
+    stopping_.store(true,std::memory_order::release);
     queue_not_empty_.notify_all();
 }
 
 void thread_pool::operator()(execution_kind kind,task_t f)
 {
-    if(stopping_.test(std::memory_order::acquire))
+    if(stopping_.load(std::memory_order::acquire))
         return;
     if(kind!=execution_kind::post&&!running_in_this_thread())
         kind = execution_kind::post;

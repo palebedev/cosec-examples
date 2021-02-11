@@ -25,7 +25,10 @@ private:
     std::condition_variable queue_not_empty_,no_busy_workers_;
     std::queue<task_t> tasks_;
     unsigned busy_workers_ = 0;
-    std::atomic_flag stopping_{};
+    // FIXME: an atomic_flag is guaranteed to always be lock-free,
+    //        but it only has test() in C++20, not supported
+    //        everywhere yet.
+    std::atomic_bool stopping_{};
 };
 
 #endif
