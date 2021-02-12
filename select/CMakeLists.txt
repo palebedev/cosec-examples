@@ -13,5 +13,6 @@ add_executable(select
 )
 
 target_link_libraries(select PRIVATE ce::utils)
+target_link_libraries(select PRIVATE Threads::Threads)
 
 ntc_target(select)
